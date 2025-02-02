@@ -1,23 +1,33 @@
 {
-    "name": "@yulainigmatullin/sum",
-    "version": "1.0.2",
+    "name": "@yulainigmatullin/quiz",
+    "version": "1.0.1",
     "type": "module",
-    "main": "./dist/index.ts",
-    "types": "./dist/index.d.ts",
     "scripts": {},
     "keywords": [],
     "author": "Yulai",
     "license": "MIT",
-    "description": "package for easy summing",
+    "description": "quiz",
+    "bin": {
+        "quiz": "./src/index.js"
+    },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Yulai202020/npm_packages.git"
+        "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/quiz"
     },
     "bugs": {
         "url": "https://github.com/Yulai202020/npm_packages/issues"
     },
-    "homepage": "https://github.com/Yulai202020/npm_packages#readme",
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/quiz#readme",
     "dependencies": {
-        "typescript": "^5.7.3"
+        "typescript": "^5.7.3",
+        "chalk": "^5.4.1",
+        "chalk-animation": "^2.0.3",
+        "commander": "^13.1.0",
+        "figlet": "^1.8.0",
+        "gradient-string": "^3.0.0",
+        "inquirer": "^12.3.3",
+        "nanospinner": "^1.2.2",
+        "playwright": "^1.50.1",
+        "puppeteer": "^24.1.1"
     }
 }

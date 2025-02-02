@@ -11,12 +11,12 @@
     "description": "package for easy summing",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Yulai202020/npm_packages.git/sum"
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/sum"
     },
     "bugs": {
         "url": "https://github.com/Yulai202020/npm_packages/issues"
     },
-    "homepage": "https://github.com/Yulai202020/npm_packages/sum/#readme",
+    "homepage": "https://github.com/Yulai202020/npm_packages/tree/main/sum/#readme",
     "dependencies": {
         "typescript": "^5.7.3"
     }
