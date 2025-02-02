@@ -1,0 +1,23 @@
+{
+    "name": "@yulainigmatullin/sum",
+    "version": "1.0.2",
+    "type": "module",
+    "main": "./dist/index.ts",
+    "types": "./dist/index.d.ts",
+    "scripts": {},
+    "keywords": [],
+    "author": "Yulai",
+    "license": "MIT",
+    "description": "package for easy summing",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Yulai202020/npm_packages.git/sum"
+    },
+    "bugs": {
+        "url": "https://github.com/Yulai202020/npm_packages/issues"
+    },
+    "homepage": "https://github.com/Yulai202020/npm_packages/sum/#readme",
+    "dependencies": {
+        "typescript": "^5.7.3"
+    }
+}
