@@ -1,0 +1,32 @@
+{
+  "name": "@yulainigmatullin/ny-ls",
+  "version": "1.0.2",
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "Yulai",
+  "license": "MIT",
+  "description": "ls",
+  "bin": {
+    "quiz": "./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/ls"
+  },
+  "bugs": {
+    "url": "https://github.com/Yulai202020/npm_packages/issues"
+  },
+  "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ls#readme",
+  "dependencies": {
+    "chalk-animation": "^2.0.3",
+    "commander": "^13.1.0"
+  },
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
