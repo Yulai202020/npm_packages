@@ -76,11 +76,13 @@ for (let [id, dirPath] of argument.entries()) {
         const mode = modeToString(stat.mode);
         const size = sizeToString(stat.size);
 
-        if ((options.a || !file.startsWith('.')) && options.l) {
-            process.stdout.write(`${mode} ${owner} ${group} ${size} `);
-        }
+        if (options.a || !file.startsWith('.')) {
+            if (options.l) {
+                process.stdout.write(`${mode} ${owner} ${group} ${size} `);
+            }
 
-        console.log(stat.isDirectory() ? chalk.green(file) : file);
+            console.log(stat.isDirectory() ? chalk.blue(file) : file);
+        }
     }
 
     if (id !== argument.length - 1) {

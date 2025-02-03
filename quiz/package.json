@@ -19,7 +19,6 @@
     },
     "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/quiz#readme",
     "dependencies": {
-        "typescript": "^5.7.3",
         "chalk-animation": "^2.0.3",
         "commander": "^13.1.0",
         "figlet": "^1.8.0",
