@@ -50,11 +50,16 @@ function sizeToString(size) {
     }
 }
 
-program.argument('<dirs...>').version('1.0.0');
+program
+    .argument('<dirs...>')
+    .option('-a, --all', 'do not ignore entries starting with .')
+    .option('-l', 'use a long listing format')
+    .version('1.0.0');
 
 program.parse(process.argv);
 
 const argument = program.args;
+const options = program.opts();
 
 for (let [id, dirPath] of argument.entries()) {
     console.log(dirPath, ':');
@@ -71,11 +76,11 @@ for (let [id, dirPath] of argument.entries()) {
         const mode = modeToString(stat.mode);
         const size = sizeToString(stat.size);
 
-        if (stat.isDirectory()) {
-            console.log(mode, owner, group, size, chalk.green(file));
-        } else {
-            console.log(mode, owner, group, size, file);
+        if ((options.a || !file.startsWith('.')) && options.l) {
+            process.stdout.write(`${mode} ${owner} ${group} ${size} `);
         }
+
+        console.log(stat.isDirectory() ? chalk.green(file) : file);
     }
 
     if (id !== argument.length - 1) {
