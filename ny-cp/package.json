@@ -1,0 +1,29 @@
+{
+    "name": "@yulainigmatullin/ny-cp",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {},
+    "keywords": [],
+    "author": "Yulai",
+    "license": "MIT",
+    "description": "cp",
+    "bin": {
+        "ny-cp": "./src/index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cp"
+    },
+    "bugs": {
+        "url": "https://github.com/Yulai202020/npm_packages/issues"
+    },
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cp#readme",
+    "module": "index.ts",
+    "devDependencies": {
+        "@types/bun": "latest",
+        "tsup": "^8.3.6"
+    },
+    "dependencies": {
+        "commander": "^13.1.0"
+    }
+}

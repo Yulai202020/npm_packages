@@ -1,6 +1,6 @@
 {
     "name": "@yulainigmatullin/ny-ls",
-    "version": "1.0.1",
+    "version": "1.0.5",
     "type": "module",
     "scripts": {},
     "keywords": [],
@@ -12,12 +12,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/ls"
+        "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/ny-ls"
     },
     "bugs": {
         "url": "https://github.com/Yulai202020/npm_packages/issues"
     },
-    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ls#readme",
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-ls#readme",
     "dependencies": {
         "chalk-animation": "^2.0.3",
         "commander": "^13.1.0"
@@ -25,8 +25,5 @@
     "module": "index.ts",
     "devDependencies": {
         "@types/bun": "latest"
-    },
-    "peerDependencies": {
-        "typescript": "^5.0.0"
     }
 }
