@@ -12,13 +12,12 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cp"
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cp"
     },
     "bugs": {
         "url": "https://github.com/Yulai202020/npm_packages/issues"
     },
     "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cp#readme",
-    "module": "index.ts",
     "devDependencies": {
         "@types/bun": "latest",
         "tsup": "^8.3.6"

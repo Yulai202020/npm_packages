@@ -12,7 +12,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+git+https://github.com/Yulai202020/npm_packages/tree/main/ny-ls"
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-ls"
     },
     "bugs": {
         "url": "https://github.com/Yulai202020/npm_packages/issues"
@@ -22,7 +22,6 @@
         "chalk-animation": "^2.0.3",
         "commander": "^13.1.0"
     },
-    "module": "index.ts",
     "devDependencies": {
         "@types/bun": "latest"
     }

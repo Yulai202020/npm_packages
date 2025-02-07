@@ -6,7 +6,7 @@ import { program } from 'commander';
 
 async function isExists(filepath) {
     try {
-        const stats = await fs.stat(filepath);
+        await fs.stat(filepath);
         return true;
     } catch (error) {
         return false;
