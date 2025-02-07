@@ -17,6 +17,12 @@ function joinPaths(base, path) {
     return `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
 }
 
+function getFileExtension(filename) {
+    if (!filename.includes('.')) return '';
+    const parts = filename.split('.');
+    return parts.length > 1 ? parts.pop() : '';
+}
+
 async function ask(question, defualt) {
     const anwers = await inquirer.prompt({
         name: 'question1',
@@ -48,7 +54,11 @@ const version = await ask('Version ?', '1.0.0');
 const author = await ask('Author ?', defualt_author);
 const description = await ask('Description ?', '');
 
-const main = await ask('Entry point ?', 'index.js');
+const rootDir = await ask('Root dir ?', 'src');
+const outDir = await ask('Output dir ?', 'dist');
+const main = await ask('Entry point ?', 'src/index.js');
+const extension = getFileExtension(main);
+const isTypescript = extension === 'ts';
 
 const license = await ask_list(['MIT', 'ISC'], 'License ?');
 const type = await ask_list(['module', 'commonjs'], 'Type ?');
@@ -56,6 +66,8 @@ const type = await ask_list(['module', 'commonjs'], 'Type ?');
 const repository = joinPaths(defualt_git, `tree/main/${name}`);
 const homepage = repository + '#readme';
 const bugs = joinPaths(defualt_git, 'issues');
+
+// configs
 
 const package_json = `{
     "name": "${base_name}/${name}",
@@ -81,8 +93,51 @@ const package_json = `{
         "url": "${bugs}"
     },
 
-    "homepage": "git+${homepage}"
+    "homepage": "git+${homepage}",
+
+    "devDependencies": {
+        "tsup": "^8.3.6"${isTypescript ? `,\n"typescript": "^5.7.3"` : ''}
+    }
 }`;
+
+const tsconfig = `{
+    "compilerOptions": {
+        "rootDir": "${rootDir}",
+        "outDir": "${outDir}",
+
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "declaration": true,
+        "declarationMap": false,
+        "sourceMap": false,
+        "removeComments": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true
+        "paths": {
+            "@/*": ["./src/*"],
+            "$/*": ["./*"]
+        }
+    },
+
+    "include": ["${rootDir}"],
+    "exclude": ["node_modules", "${outDir}"]
+}`;
+
+const tsup_config = `import { defineConfig } from 'tsup';
+
+export default defineConfig({
+    entry: ["${main}"],
+    format: ['esm'],
+    outDir: "${outDir}",
+    dts: false,
+    splitting: false,
+    minify: false,
+    bundle: true,
+    target: 'esnext',
+});`;
 
 console.log(package_json);
 
@@ -92,4 +147,11 @@ if (isOk === 'yes') {
     await fs.writeFile('package1.json', package_json);
 } else {
     console.error('Operation stoped by user.');
+}
+
+await fs.writeFile('README.md', `# ${name}\n${description}`); // always
+await fs.writeFile('tsup.config.ts', tsup_config); // always
+
+if (extension === 'ts') {
+    await fs.writeFile('tsconfig.json', tsconfig);
 }
