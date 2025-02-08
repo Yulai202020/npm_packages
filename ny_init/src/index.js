@@ -5,8 +5,11 @@ import fs from 'node:fs/promises';
 
 import inquirer from 'inquirer';
 import { program } from 'commander';
+import { config } from 'dotenv';
 
 // get same needed stuff from env
+
+config({ path: path.join(process.cwd(), '.env') });
 
 const env = process.env;
 const defualt_base_name = env.BASE_NAME;
@@ -20,7 +23,7 @@ if (!defualt_base_name || !defualt_author || !defualt_git) {
     process.exit(1);
 }
 
-program.version('1.0.0').description('Program to generate configs.');
+program.version('1.0.5').description('Program to generate configs.');
 
 program.parse(process.argv);
 

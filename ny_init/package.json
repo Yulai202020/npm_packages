@@ -1,6 +1,6 @@
 {
     "name": "@yulainigmatullin/ny_init",
-    "version": "1.0.5",
+    "version": "1.0.7",
     "type": "module",
     "scripts": {},
     "keywords": [],
@@ -20,6 +20,7 @@
     "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny_init#readme",
     "dependencies": {
         "commander": "^13.1.0",
+        "dotenv": "^16.4.7",
         "inquirer": "^12.4.1"
     }
 }
