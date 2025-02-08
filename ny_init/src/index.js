@@ -11,6 +11,13 @@ const defualt_base_name = env.BASE_NAME;
 const defualt_author = env.AUTHOR;
 const defualt_git = env.GIT;
 
+if (defualt_base_name || defualt_author || defualt_git) {
+    console.error(
+        'Enviremont is not defined (BASE_NAME, AUTHOR and GIT variables).'
+    );
+    process.exit(1);
+}
+
 program.version('1.0.0').description('Program to generate configs.');
 
 program.parse(process.argv);
@@ -28,27 +35,37 @@ function getFileExtension(filename) {
 }
 
 async function ask(question, defualt) {
-    const anwers = await inquirer.prompt({
-        name: 'question1',
-        type: 'input',
-        message: question,
-        default() {
-            return defualt;
-        },
-    });
+    try {
+        const anwers = await inquirer.prompt({
+            name: 'question1',
+            type: 'input',
+            message: question,
+            default() {
+                return defualt;
+            },
+        });
 
-    return anwers.question1;
+        return anwers.question1;
+    } catch {
+        console.log('^C');
+        process.exit(1);
+    }
 }
 
 async function ask_list(choices, question) {
-    const anwers = await inquirer.prompt({
-        name: 'question1',
-        type: 'list',
-        message: question,
-        choices: choices,
-    });
+    try {
+        const anwers = await inquirer.prompt({
+            name: 'question1',
+            type: 'list',
+            message: question,
+            choices: choices,
+        });
 
-    return anwers.question1;
+        return anwers.question1;
+    } catch {
+        console.log('^C');
+        process.exit(1);
+    }
 }
 
 // ask user
@@ -122,6 +139,7 @@ const tsconfig = `{
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "skipLibCheck": true
+
         "paths": {
             "@/*": ["./src/*"],
             "$/*": ["./*"]

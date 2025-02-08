@@ -1,20 +1,23 @@
 {
     "name": "@yulainigmatullin/ny_init",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "type": "module",
     "scripts": {},
     "keywords": [],
     "author": "Yulai",
     "license": "MIT",
     "description": "",
+    "bin": {
+        "ny_init": "src/index.js"
+    },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Yulai202020/tree/main/ny_init"
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny_init"
     },
     "bugs": {
-        "url": "https://github.com/issues"
+        "url": "https://github.com/Yulai202020/npm_packages/issues"
     },
-    "homepage": "git+https://github.com/Yulai202020/tree/main/ny_init#readme",
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny_init#readme",
     "dependencies": {
         "commander": "^13.1.0",
         "inquirer": "^12.4.1"
