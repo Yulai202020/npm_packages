@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-import inquirer from 'inquirer';
+import path from 'node:path';
 import fs from 'node:fs/promises';
+
+import inquirer from 'inquirer';
 import { program } from 'commander';
 
 // get same needed stuff from env
@@ -77,11 +79,13 @@ const version = await ask('Version ?', '1.0.0');
 const author = await ask('Author ?', defualt_author);
 const description = await ask('Description ?', '');
 
-const rootDir = await ask('Root dir ?', 'src');
-const outDir = await ask('Output dir ?', 'dist');
 const main = await ask('Entry point ?', 'src/index.js');
+
 const extension = getFileExtension(main);
 const isTypescript = extension === 'ts';
+
+const outDir = 'dist';
+const rootDir = path.dirname(main);
 
 const license = await ask_list(['MIT', 'ISC'], 'License ?');
 const type = await ask_list(['module', 'commonjs'], 'Type ?');
