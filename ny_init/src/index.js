@@ -7,6 +7,8 @@ import inquirer from 'inquirer';
 import { program } from 'commander';
 import { config } from 'dotenv';
 
+import packageJson from "../package.json" with { type: "json" };
+
 // get same needed stuff from env
 
 config({ path: path.join(process.cwd(), '.env') });
@@ -23,7 +25,7 @@ if (!defualt_base_name || !defualt_author || !defualt_git) {
     process.exit(1);
 }
 
-program.version('1.0.5').description('Program to generate configs.');
+program.version(packageJson.version).description('Program to generate configs.');
 
 program.parse(process.argv);
 

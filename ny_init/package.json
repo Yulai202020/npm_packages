@@ -1,14 +1,16 @@
 {
     "name": "@yulainigmatullin/ny_init",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "type": "module",
-    "scripts": {},
+    "scripts": {
+        "build": "tsup"
+    },
     "keywords": [],
     "author": "Yulai",
     "license": "MIT",
     "description": "",
     "bin": {
-        "ny_init": "src/index.js"
+        "ny_init": "./dist/index.js"
     },
     "repository": {
         "type": "git",
@@ -21,6 +23,8 @@
     "dependencies": {
         "commander": "^13.1.0",
         "dotenv": "^16.4.7",
-        "inquirer": "^12.4.1"
+        "inquirer": "^12.4.1",
+        "tsup": "^8.3.6",
+        "typescript": "^5.7.3"
     }
 }
