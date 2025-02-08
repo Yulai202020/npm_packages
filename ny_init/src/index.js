@@ -13,7 +13,7 @@ const defualt_base_name = env.BASE_NAME;
 const defualt_author = env.AUTHOR;
 const defualt_git = env.GIT;
 
-if (defualt_base_name || defualt_author || defualt_git) {
+if (!defualt_base_name || !defualt_author || !defualt_git) {
     console.error(
         'Enviremont is not defined (BASE_NAME, AUTHOR and GIT variables).'
     );
@@ -87,7 +87,7 @@ const isTypescript = extension === 'ts';
 const outDir = 'dist';
 const rootDir = path.dirname(main);
 
-const license = await ask_list(['MIT', 'ISC'], 'License ?');
+const license = await ask('License ?', 'MIT');
 const type = await ask_list(['module', 'commonjs'], 'Type ?');
 
 const repository = joinPaths(defualt_git, `tree/main/${name}`);
