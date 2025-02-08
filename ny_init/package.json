@@ -1,5 +1,5 @@
 {
-    "name": "@yulainigmatullin/npm_init",
+    "name": "@yulainigmatullin/ny_init",
     "version": "1.0.0",
     "type": "module",
     "scripts": {},
@@ -9,12 +9,12 @@
     "description": "",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Yulai202020/tree/main/npm_init"
+        "url": "git+https://github.com/Yulai202020/tree/main/ny_init"
     },
     "bugs": {
         "url": "https://github.com/issues"
     },
-    "homepage": "git+https://github.com/Yulai202020/tree/main/npm_init#readme",
+    "homepage": "git+https://github.com/Yulai202020/tree/main/ny_init#readme",
     "dependencies": {
         "commander": "^13.1.0",
         "inquirer": "^12.4.1"

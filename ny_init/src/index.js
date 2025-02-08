@@ -4,14 +4,18 @@ import inquirer from 'inquirer';
 import fs from 'node:fs/promises';
 import { program } from 'commander';
 
+// get same needed stuff from env
+
 const env = process.env;
 const defualt_base_name = env.BASE_NAME;
 const defualt_author = env.AUTHOR;
 const defualt_git = env.GIT;
 
-program.version('1.0.0');
+program.version('1.0.0').description('Program to generate configs.');
 
 program.parse(process.argv);
+
+// needed functions
 
 function joinPaths(base, path) {
     return `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
@@ -47,6 +51,8 @@ async function ask_list(choices, question) {
     return anwers.question1;
 }
 
+// ask user
+
 const base_name = await ask('Base name ?', defualt_base_name);
 const name = await ask('Package name ?', 'project');
 const version = await ask('Version ?', '1.0.0');
@@ -67,7 +73,7 @@ const repository = joinPaths(defualt_git, `tree/main/${name}`);
 const homepage = repository + '#readme';
 const bugs = joinPaths(defualt_git, 'issues');
 
-// configs
+// generating configs
 
 const package_json = `{
     "name": "${base_name}/${name}",
@@ -139,18 +145,23 @@ export default defineConfig({
     target: 'esnext',
 });`;
 
+const readme = `# ${name}
+${description}`;
+
 console.log(package_json);
 
 const isOk = await ask('Is this OK?', 'yes');
 
 if (isOk === 'yes') {
-    await fs.writeFile('package1.json', package_json);
+    await fs.writeFile('package.json', package_json);
 } else {
     console.error('Operation stoped by user.');
+    process.exit(1);
 }
 
-await fs.writeFile('README.md', `# ${name}\n${description}`); // always
+await fs.writeFile('README.md', readme); // always
 await fs.writeFile('tsup.config.ts', tsup_config); // always
+await fs.writeFile(main, `console.log("Hello world!")`); // always
 
 if (extension === 'ts') {
     await fs.writeFile('tsconfig.json', tsconfig);
