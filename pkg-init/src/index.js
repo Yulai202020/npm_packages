@@ -20,7 +20,7 @@ const url = await getRepositoryUrl();
 const [_, host, user, repo] = await getDataFromUrl(url);
 const data = await getGithubData(user);
 
-const default_git = `https://${host}/${user}/${repo}`;
+const defualt_git = `https://${host}/${user}/${repo}`;
 const defualt_author = data.name;
 const defualt_base_name = data.login;
 
