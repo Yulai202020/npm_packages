@@ -4,6 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 
 import inquirer from 'inquirer';
+import { getGithubData, getRepositoryUrl, getDataFromUrl } from "@yulainigmatullin/github-tools";
 import { program } from 'commander';
 import { config } from 'dotenv';
 
@@ -14,16 +15,14 @@ import packageJson from "../package.json" with { type: "json" };
 config({ path: path.join(process.cwd(), '.env') });
 
 const env = process.env;
-const defualt_base_name = env.BASE_NAME;
-const defualt_author = env.AUTHOR;
-const defualt_git = env.GIT;
 
-if (!defualt_base_name || !defualt_author || !defualt_git) {
-    console.error(
-        'Enviremont is not defined (BASE_NAME, AUTHOR and GIT variables).'
-    );
-    process.exit(1);
-}
+const url = await getRepositoryUrl();
+const [_, host, user, repo] = await getDataFromUrl(url);
+const data = await getGithubData(user);
+
+const default_git = `https://${host}/${user}/${repo}`;
+const defualt_author = data.name;
+const defualt_base_name = data.login;
 
 program.version(packageJson.version).description('Program to generate configs.');
 
@@ -188,6 +187,8 @@ if (isOk === 'yes') {
 
 await fs.writeFile('README.md', readme); // always
 await fs.writeFile('tsup.config.ts', tsup_config); // always
+
+await fs.mkdir(path.dirname(main), { recursive: true });
 await fs.writeFile(main, `console.log("Hello world!")`); // always
 
 if (extension === 'ts') {

@@ -1,6 +1,6 @@
 {
-    "name": "@yulainigmatullin/ny_init",
-    "version": "1.0.8",
+    "name": "@yulainigmatullin/pkg-init",
+    "version": "1.0.1",
     "type": "module",
     "scripts": {
         "build": "tsup"
@@ -10,17 +10,18 @@
     "license": "MIT",
     "description": "",
     "bin": {
-        "ny_init": "./dist/index.js"
+        "pkg-init": "./dist/index.js"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny_init"
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/pkg-init"
     },
     "bugs": {
         "url": "https://github.com/Yulai202020/npm_packages/issues"
     },
-    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny_init#readme",
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/pkg-init#readme",
     "dependencies": {
+        "@yulainigmatullin/github-tools": "^1.0.0",
         "commander": "^13.1.0",
         "dotenv": "^16.4.7",
         "inquirer": "^12.4.1",

@@ -1,0 +1,24 @@
+{
+    "name": "@yulainigmatullin/ny-mkdir",
+    "version": "1.0.0",
+    "bun": {
+        "ny-mkdir": "src/index.js"
+    },
+    "type": "module",
+    "scripts": {},
+    "keywords": [],
+    "author": "Yulai",
+    "description": "",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-mkdir"
+    },
+    "bugs": {
+        "url": "https://github.com/Yulai202020/npm_packages/issues"
+    },
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-mkdir#readme",
+    "devDependencies": {
+        "tsup": "^8.3.6"
+    }
+}
