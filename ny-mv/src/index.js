@@ -24,8 +24,8 @@ const from = argument[0];
 const to = argument[1];
 
 try {
-    const stats = await promises.stat(from);
+    await promises.stat(from);
     await moveFile(from, to);
 } catch (e) {
-    console.log('File/dir doesnt exist');
+    console.log(`${process.argv[0]}: ${from}: No such file or directory.`);
 }

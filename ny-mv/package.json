@@ -1,7 +1,9 @@
 {
     "name": "@yulainigmatullin/ny-mv",
-    "version": "1.0.0",
-    "main": "src/index.js",
+    "version": "1.0.1",
+    "bin": {
+        "pkg-init": "./src/index.js"
+    },
     "type": "module",
     "scripts": {},
     "keywords": [],

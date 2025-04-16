@@ -30,15 +30,20 @@ const to = argument[1];
 const isRecursive = options.recursive ? true : false;
 
 if (!(await isExists(from))) {
-    throw new Error('Cannot copy file from doesnt exist file.');
+    console.log('Cannot copy file from doesnt exist file.');
+    process.exit(0);
 } else if (await isExists(to)) {
-    throw new Error('You cant copy file to existing file.');
+    console.log('You cant copy file to existing file.');
+    process.exit(0);
 }
 
 const stats = await fs.stat(from);
 
 if (stats.isDirectory() && !isRecursive) {
-    throw new Error(`cp: -r not specified; omitting directory '${from}'`);
+    console.log(
+        `${process.argv[0]}: -r not specified; omitting directory '${from}'`
+    );
+    process.exit(0);
 }
 
 await fs.cp(from, to, { recursive: isRecursive });
