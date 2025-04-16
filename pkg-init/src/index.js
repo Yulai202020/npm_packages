@@ -6,10 +6,13 @@ import fs from 'node:fs/promises';
 import inquirer from 'inquirer';
 import { getGitMeta } from "@yulainigmatullin/github-tools";
 import { program } from 'commander';
+import { config } from 'dotenv';
 
 import packageJson from "../package.json" with { type: "json" };
 
 // get same needed stuff from env
+
+config();
 
 const env = process.env;
 

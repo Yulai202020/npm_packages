@@ -1,0 +1,25 @@
+{
+    "name": "@yulainigmatullin/project",
+    "version": "1.0.0",
+    "main": "src/index.js",
+    "type": "module",
+    "scripts": {},
+    "keywords": [],
+    "author": "Yulai Nigmatullin",
+    "description": "",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cat"
+    },
+    "bugs": {
+        "url": "https://github.com/Yulai202020/npm_packages/issues"
+    },
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-cat#readme",
+    "devDependencies": {
+        "tsup": "^8.3.6"
+    },
+    "dependencies": {
+        "commander": "^13.1.0"
+    }
+}
