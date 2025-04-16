@@ -4,25 +4,20 @@ import path from 'node:path';
 import fs from 'node:fs/promises';
 
 import inquirer from 'inquirer';
-import { getGithubData, getRepositoryUrl, getDataFromUrl } from "@yulainigmatullin/github-tools";
+import { getGitMeta } from "@yulainigmatullin/github-tools";
 import { program } from 'commander';
-import { config } from 'dotenv';
 
 import packageJson from "../package.json" with { type: "json" };
 
 // get same needed stuff from env
 
-config({ path: path.join(process.cwd(), '.env') });
-
 const env = process.env;
 
-const url = await getRepositoryUrl();
-const [_, host, user, repo] = await getDataFromUrl(url);
-const data = await getGithubData(user);
+const gitMeta = await getGitMeta();
 
-const defualt_git = `https://${host}/${user}/${repo}`;
-const defualt_author = data.name;
-const defualt_base_name = data.login;
+const defualt_git = env.GIT || gitMeta.repoUrl;
+const defualt_author = env.AUTHOR || gitMeta.author;
+const defualt_base_name = env.BASE_NAME || gitMeta.baseName;
 
 program.version(packageJson.version).description('Program to generate configs.');
 

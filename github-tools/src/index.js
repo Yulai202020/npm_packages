@@ -3,40 +3,60 @@ import util from 'util';
 
 const execPromise = util.promisify(exec);
 
-async function getGithubData(username) {
+async function getRepositoryUrl() {
     try {
-        const response = await fetch(
-            `https://api.github.com/users/${username}`
-        );
-
-        if (!response.ok) {
-            throw new Error('User not found');
-        }
-
-        const data = await response.json();
-        return data;
+        const { stdout } = await execPromise('git remote get-url origin');
+        return stdout.trim();
     } catch (error) {
-        console.error('Error fetching data:', error);
         return null;
     }
 }
 
-function getDataFromUrl(ssh_url) {
-    const [ssh_user, host, user, repo] = ssh_url.split(/[@:/]/);
+function getDataFromUrl(url) {
+    if (!url) return [];
 
-    return [ssh_user, host, user, repo];
+    const cleaned = url.replace(/\.git$/, '');
+    return cleaned.split(/[@:/]+/);
 }
 
-async function getRepositoryUrl() {
-    try {
-        const { stdout, stderr } = await execPromise(
-            'git remote get-url origin'
-        );
+async function getGithubData(username) {
+    if (!username) return null;
 
-        return stdout.slice(0, -1); // remove latest enter
-    } catch (error) {
-        console.error(`Error executing command: ${error}`);
+    try {
+        const response = await fetch(
+            `https://api.github.com/users/${username}`
+        );
+        if (!response.ok) throw new Error('GitHub user not found');
+
+        return await response.json();
+    } catch (err) {
+        console.warn(
+            `[github-tools] Failed to fetch user data for "${username}":`,
+            err.message
+        );
+        return null;
     }
 }
 
-export { getGithubData, getDataFromUrl, getRepositoryUrl };
+async function getGitMeta({ fallbackToGitHub = true } = {}) {
+    const url = await getRepositoryUrl();
+
+    if (!url || !fallbackToGitHub) {
+        return {
+            repoUrl: null,
+            author: null,
+            baseName: null,
+        };
+    }
+
+    const [_, host, user, repo] = getDataFromUrl(url);
+    const data = await getGithubData(user);
+
+    return {
+        repoUrl: `https://${host}/${user}/${repo}`,
+        author: data?.name || user,
+        baseName: data?.login || user,
+    };
+}
+
+export { getRepositoryUrl, getDataFromUrl, getGithubData, getGitMeta };
