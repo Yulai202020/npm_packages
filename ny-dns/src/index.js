@@ -13,6 +13,10 @@ function isArray(array) {
     return Array.isArray(array);
 }
 
+function isNotListOfObjects(arr) {
+    return isArray(arr) && arr.every(item => typeof item !== 'object' || item === null);
+}
+
 function isObject(value) {
     return typeof value === 'object' && value !== null && !isArray(value)
 }
@@ -44,8 +48,8 @@ function isEmpty(variable) {
 }
 
 // main functions
-async function getAllDNSRecordsJSON(domain, dnsServer) {
-    dns.setServers([dnsServer]);
+async function getAllDNSRecordsJSON(domain, dnsServer, port) {
+    dns.setServers([`${dnsServer}:${port}`]);
 
     const lookupTypes = {
         "A": "resolve4",
@@ -91,14 +95,14 @@ async function getAllDNSRecordsJSON(domain, dnsServer) {
     return sortedJson;
 }
 
-async function getDNSRecordsJSON(domain, dnsServer, type="A") {
-    const json = await getAllDNSRecordsJSON(domain, dnsServer);
+async function getDNSRecordsJSON(domain, dnsServer, port, type="A") {
+    const json = await getAllDNSRecordsJSON(domain, dnsServer, port);
 
     return json[type];
 }
 
-async function getAllDNSRecords(domain, dnsServer) {
-    const json = await getAllDNSRecordsJSON(domain, dnsServer);
+async function getAllDNSRecords(domain, dnsServer, port) {
+    const json = await getAllDNSRecordsJSON(domain, dnsServer, port);
 
     // make table
     const baseRows = [];
@@ -134,25 +138,44 @@ async function getAllDNSRecords(domain, dnsServer) {
     console.log(t1.render());
 }
 
-async function getDNSRecords(domain, dnsServer, type="A") {
-    const answer = await getDNSRecordsJSON(domain, dnsServer, type);
+async function getDNSRecords(domain, dnsServer, port, type="A") {
+    let answer = await getDNSRecordsJSON(domain, dnsServer, port, type);
     const rows = []
 
-    if (!isArray(answer)) {
-        rows.push([ formatJson(answer) ]);
-    } else {
-        rows.push(answer);
+    function formatValues(list) {
+        if (isArray(list)) {
+            return list.map(item => {
+                if (isArray(item) && !isObject(item)) {
+                    return formatValues(item);
+                } else {
+                    return formatJson(item);
+                }
+            });
+        } else {
+            return formatJson(list);
+        }
     }
     
+    answer = formatValues(answer);
+
+    if (isArray(answer)) {
+        answer.forEach(item => {
+            rows.push([item]);
+        });
+    } else {
+        rows.push([answer]);
+    }
+
     const t1 = Table([{value: type}], rows);
     console.log(t1.render());
 }
 
 program
     .argument('<site>')
+    .option('-p, --port <port>', 'Specify the DNS record type', 53)
+    .option('-d, --dns <dns_server>', 'Specify the DNS server', '8.8.8.8')
     .option('-t, --type <type>', 'Specify the DNS record type')
     .option('-j, --json <json_file>', 'Save record as json file')
-    .option('-d, --dns <dns_server>', 'Specify the DNS server', '8.8.8.8')
     .version(packageJson.version)
     .description('Program to make dns request files.');
 
@@ -163,6 +186,7 @@ const site = argument[0];
 
 const options = program.opts();
 
+const dnsPort = options.port;
 const dnsServer = options.dns;
 const dnsType = options?.type?.toUpperCase() || "ALL";
 const output_file = options?.json;
@@ -171,9 +195,9 @@ let json = null;
 
 if (dnsType === "ALL") {
     if (output_file) {
-        json = await getAllDNSRecordsJSON(site, dnsServer);
+        json = await getAllDNSRecordsJSON(site, dnsServer, dnsPort);
     } else {
-        await getAllDNSRecords(site, dnsServer);
+        await getAllDNSRecords(site, dnsServer, dnsPort);
     }
 } else {
     if (!recordTypes.includes(dnsType)) {
@@ -182,10 +206,10 @@ if (dnsType === "ALL") {
     }
 
     if (output_file) {
-        json = await getDNSRecordsJSON(site, dnsServer, dnsType);
+        json = await getDNSRecordsJSON(site, dnsServer, dnsPort, dnsType);
     } else {
         const dnsType = options.type.toUpperCase();
-        await getDNSRecords(site, dnsServer, dnsType);
+        await getDNSRecords(site, dnsServer, dnsPort, dnsType);
     }
 }
 

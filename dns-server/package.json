@@ -1,0 +1,9 @@
+{
+    "type": "module",
+    "dependencies": {
+        "dgram": "^1.0.1",
+        "dns-packet": "^5.6.1",
+        "winston": "^3.17.0",
+        "winston-journald": "^0.5.0"
+    }
+}

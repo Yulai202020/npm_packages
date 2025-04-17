@@ -1,0 +1,1 @@
+sudo /home/yulai/.bun/bin/bun src/index.js
