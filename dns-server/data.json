@@ -1,0 +1,6 @@
+{
+    "example.com": {
+        "A": ["127.0.0.1"],
+        "MX": [{ "preference": 10, "exchange": "mail.example.com" }]
+    }
+}

@@ -3,6 +3,23 @@
 import dgram from 'dgram';
 import packet from 'dns-packet';
 import winston from 'winston';
+import { program } from 'commander';
+import data from './data.json' with { type: 'json' };
+import packageJson from "../package.json" with { type: "json" };
+
+program
+    .option('-p, --port <port>', 'Specify the server port', 53)
+    .option('--dns-port <port>', 'Specify the upstream DNS port', 53)
+    .option('-d, --dns <dns_server>', 'Specify the upstream DNS server', '8.8.8.8')
+    .version(packageJson.version)
+    .description("My own DNS Server.");
+
+program.parse(process.argv);
+
+const options = program.opts();
+
+const LOCAL_PORT = options.port;
+const UPSTREAM_DNS = { address: options.dns, port: options.dns_port };
 
 const logger = winston.createLogger({
     level: 'info',
@@ -15,32 +32,8 @@ const logger = winston.createLogger({
     transports: [new winston.transports.File({ filename: 'app.log' })],
 });
 
-program
-    .argument('<site>')
-    .option('-o, --old', 'Print like a host command', false)
-    .option('-p, --port <port>', 'Specify the DNS port', 53)
-    .option(
-        '-d, --dns <dns_server>',
-        'Specify the DNS server',
-        dns.getServers()[0]
-    )
-    .option('-t, --type <type>', 'Specify the DNS record type', 'ALL')
-    .option('-j, --json <json_file>', 'Save record as json file')
-    .version(packageJson.version)
-    .description('Program to make dns request files.');
-
-const LOCAL_PORT = 53;
-const UPSTREAM_DNS = { address: '8.8.8.8', port: 53 };
-
 const server = dgram.createSocket('udp4');
 const upstream = dgram.createSocket('udp4');
-
-const data = {
-    'example.com': {
-        A: ['127.0.0.1'],
-        MX: [{ preference: 10, exchange: 'mail.example.com' }],
-    },
-};
 
 server.on('message', (msg, rinfo) => {
     let query;
