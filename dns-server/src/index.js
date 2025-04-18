@@ -15,6 +15,20 @@ const logger = winston.createLogger({
     transports: [new winston.transports.File({ filename: 'app.log' })],
 });
 
+program
+    .argument('<site>')
+    .option('-o, --old', 'Print like a host command', false)
+    .option('-p, --port <port>', 'Specify the DNS port', 53)
+    .option(
+        '-d, --dns <dns_server>',
+        'Specify the DNS server',
+        dns.getServers()[0]
+    )
+    .option('-t, --type <type>', 'Specify the DNS record type', 'ALL')
+    .option('-j, --json <json_file>', 'Save record as json file')
+    .version(packageJson.version)
+    .description('Program to make dns request files.');
+
 const LOCAL_PORT = 53;
 const UPSTREAM_DNS = { address: '8.8.8.8', port: 53 };
 

@@ -1,4 +1,5 @@
 # dns server
+
 syslogs
 systemd-unit
 db
@@ -6,6 +7,9 @@ load example.com
 log pid/user/program name
 
 # dns cli
+
 make dns rbl
 
 learn structure of dns/udp package
+
+upstream setting (dns server ip/port)
