@@ -5,16 +5,17 @@ import dns from 'dns';
 import Table from "tty-table";
 import { program } from 'commander';
 import packageJson from "../package.json" with { type: "json" };
+import net from 'net';
 
 const recordTypes = ["A", "AAAA", "CNAME", "MX", "TXT", "NS", "SOA", "PTR", "SRV"];
+
+function isIP(input) {
+    return net.isIP(input) !== 0;
+}
 
 // tools
 function isArray(array) {
     return Array.isArray(array);
-}
-
-function isNotListOfObjects(arr) {
-    return isArray(arr) && arr.every(item => typeof item !== 'object' || item === null);
 }
 
 function isObject(value) {
@@ -47,10 +48,23 @@ function isEmpty(variable) {
     return false;
 }
 
-// main functions
-async function getAllDNSRecordsJSON(domain, dnsServer, port) {
-    dns.setServers([`${dnsServer}:${port}`]);
+async function isDnsServerReachable(dnsServer, port = 53) {
+    return new Promise((resolve, reject) => {
+        const resolver = new dns.Resolver();
+        resolver.setServers([`${dnsServer}:${port}`]);
 
+        resolver.resolve4('example.com', (err, addresses) => {
+            if (err) {
+                reject(new Error(`DNS server ${dnsServer}:${port} is not reachable: ${err.message}`));
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+// main functions
+async function getAllDNSRecords(domain) {
     const lookupTypes = {
         "A": "resolve4",
         "AAAA": "resolve6",
@@ -85,6 +99,7 @@ async function getAllDNSRecordsJSON(domain, dnsServer, port) {
 
     await Promise.all(recordPromises);
 
+
     const sortedJson = {};
     recordTypes.forEach((type) => {
         if (json[type] !== undefined) {
@@ -95,19 +110,23 @@ async function getAllDNSRecordsJSON(domain, dnsServer, port) {
     return sortedJson;
 }
 
-async function getDNSRecordsJSON(domain, dnsServer, port, type="A") {
-    const json = await getAllDNSRecordsJSON(domain, dnsServer, port);
+async function getDNSRecords(domain, type="A") {
+    const json = await getAllDNSRecords(domain);
 
     return json[type];
 }
 
-async function getAllDNSRecords(domain, dnsServer, port) {
-    const json = await getAllDNSRecordsJSON(domain, dnsServer, port);
+async function printAllDNSRecords(domain) {
+    const json = await getAllDNSRecords(domain);
 
-    // make table
     const baseRows = [];
 
     const activeTypes = recordTypes.filter(type => !isEmpty(json[type]));
+
+    if (isEmpty(activeTypes)) {
+        console.log(`Data for host ${domain} not found.`);
+        return ;
+    }
 
     const maxRows = Math.max(...activeTypes.map(type => json[type]?.length || 0));
     const header = activeTypes.map(type => ({ value: type }));
@@ -138,8 +157,8 @@ async function getAllDNSRecords(domain, dnsServer, port) {
     console.log(t1.render());
 }
 
-async function getDNSRecords(domain, dnsServer, port, type="A") {
-    let answer = await getDNSRecordsJSON(domain, dnsServer, port, type);
+async function printDNSRecords(domain, type="A") {
+    let answer = await getDNSRecords(domain, type);
     const rows = []
 
     function formatValues(list) {
@@ -170,11 +189,24 @@ async function getDNSRecords(domain, dnsServer, port, type="A") {
     console.log(t1.render());
 }
 
+async function getPTRRecords(domain) {
+    return new Promise(resolve => {
+        dns.reverse(domain, (err, records) => {
+            if (err) {
+                resolve([]);
+            } else {
+                resolve(records);
+            }
+        });
+    });
+}
+
 program
     .argument('<site>')
-    .option('-p, --port <port>', 'Specify the DNS record type', 53)
-    .option('-d, --dns <dns_server>', 'Specify the DNS server', '8.8.8.8')
-    .option('-t, --type <type>', 'Specify the DNS record type')
+    .option('-o, --old', 'Print like a host command', false)
+    .option('-p, --port <port>', 'Specify the DNS port', 53)
+    .option('-d, --dns <dns_server>', 'Specify the DNS server', dns.getServers()[0])
+    .option('-t, --type <type>', 'Specify the DNS record type', 'ALL')
     .option('-j, --json <json_file>', 'Save record as json file')
     .version(packageJson.version)
     .description('Program to make dns request files.');
@@ -188,32 +220,31 @@ const options = program.opts();
 
 const dnsPort = options.port;
 const dnsServer = options.dns;
-const dnsType = options?.type?.toUpperCase() || "ALL";
+const dnsType = options.type.toUpperCase();
+
+const oldPrint = options.old;
 const output_file = options?.json;
+
+await isDnsServerReachable(dnsServer, dnsPort);
+dns.setServers([`${dnsServer}:${dnsPort}`]);
 
 let json = null;
 
-if (dnsType === "ALL") {
-    if (output_file) {
-        json = await getAllDNSRecordsJSON(site, dnsServer, dnsPort);
-    } else {
-        await getAllDNSRecords(site, dnsServer, dnsPort);
-    }
+if (output_file) {
+    json = await getAllDNSRecords(site);
+} else if (isIP(site)) {
+    console.log(await getPTRRecords(site));
+} else if (dnsType === "ALL") {
+    await printAllDNSRecords(site);
+} else if (recordTypes.includes(dnsType)) {
+    const dnsType = options.type.toUpperCase();
+    await printDNSRecords(site, dnsType);
 } else {
-    if (!recordTypes.includes(dnsType)) {
-        console.log(`Invalid type: ${dnsType}`);
-        process.exit(1);
-    }
-
-    if (output_file) {
-        json = await getDNSRecordsJSON(site, dnsServer, dnsPort, dnsType);
-    } else {
-        const dnsType = options.type.toUpperCase();
-        await getDNSRecords(site, dnsServer, dnsPort, dnsType);
-    }
+    console.log(`Invalid type: ${dnsType}`);
+    process.exit(1);
 }
 
-if (output_file) {
+if (output_file && json) {
     fs.writeFile(output_file, JSON.stringify(json, null, '\t'), (err) => {
         if (err) {
             console.error('Error writing to file:', err);

@@ -35,7 +35,6 @@ server.on('message', (msg, rinfo) => {
     } catch (err) {
         logger.error(`Failed to decode packet: ${err}`);
         console.error(`Failed to decode packet: ${err}`);
-        // journaldLogger.error('error', `Failed to decode packet: ${err}`);
 
         return;
     }
@@ -106,9 +105,6 @@ server.on('listening', () => {
     const address = server.address();
     logger.info(`DNS server listening on ${address.address}:${address.port}`);
     console.log(`DNS server listening on ${address.address}:${address.port}`);
-    // journaldLogger.info(
-    //     `DNS server listening on ${address.address}:${address.port}`
-    // );
 });
 
 server.bind(LOCAL_PORT);
