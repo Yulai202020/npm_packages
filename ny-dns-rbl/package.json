@@ -1,0 +1,26 @@
+{
+  "name": "@yulainigmatullin/ny-dns-rbl",
+  "version": "1.0.0",
+  "bin": {
+      "ny-dns-rbl": "./src/index.js"
+  },
+  "type": "module",
+  "scripts": {},
+  "keywords": [],
+  "author": "Yulai Nigmatullin",
+  "description": "",
+  "license": "MIT",
+  "repository": {
+      "type": "git",
+      "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-dns-rbl"
+  },
+  "bugs": {
+      "url": "https://github.com/Yulai202020/npm_packages/issues"
+  },
+  "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/ny-dns-rbl#readme",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "dns": "^0.2.2",
+    "net": "^1.0.2"
+  }
+}

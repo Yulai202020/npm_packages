@@ -1,7 +1,10 @@
 {
     "type": "module",
+    "version": "1.0.0",
     "dependencies": {
+        "commander": "^13.1.0",
         "dgram": "^1.0.1",
+        "dns": "^0.2.2",
         "dns-packet": "^5.6.1",
         "winston": "^3.17.0",
         "winston-journald": "^0.5.0"

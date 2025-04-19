@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 
+import dns from "dns";
 import dgram from 'dgram';
 import packet from 'dns-packet';
+
 import winston from 'winston';
 import { program } from 'commander';
-import data from './data.json' with { type: 'json' };
+
+import data from '../data.json' with { type: 'json' };
 import packageJson from "../package.json" with { type: "json" };
 
 program
     .option('-p, --port <port>', 'Specify the server port', 53)
     .option('--dns-port <port>', 'Specify the upstream DNS port', 53)
-    .option('-d, --dns <dns_server>', 'Specify the upstream DNS server', '8.8.8.8')
+    .option('-d, --dns <dns_server>', 'Specify the upstream DNS server', dns.getServers()[0])
     .version(packageJson.version)
     .description("My own DNS Server.");
 
@@ -19,7 +22,7 @@ program.parse(process.argv);
 const options = program.opts();
 
 const LOCAL_PORT = options.port;
-const UPSTREAM_DNS = { address: options.dns, port: options.dns_port };
+const UPSTREAM_DNS = { address: options.dns, port: options.dnsPort };
 
 const logger = winston.createLogger({
     level: 'info',
@@ -80,7 +83,9 @@ server.on('message', (msg, rinfo) => {
         };
 
         const buf = packet.encode(response);
-        server.send(buf, 0, buf.length, rinfo.port, rinfo.address, () => {});
+        server.send(buf, 0, buf.length, rinfo.port, rinfo.address, () => {
+            console.log("Response sent to client");
+        });
     } else {
         upstream.send(
             msg,
@@ -89,7 +94,7 @@ server.on('message', (msg, rinfo) => {
             UPSTREAM_DNS.port,
             UPSTREAM_DNS.address
         );
-
+    
         upstream.once('message', (upstreamResponse) => {
             server.send(
                 upstreamResponse,
