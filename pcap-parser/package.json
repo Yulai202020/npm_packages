@@ -1,0 +1,28 @@
+{
+    "name": "@yulainigmatullin/pcap-parser",
+    "version": "1.0.0",
+    "bin": {
+        "pcap-parser": "src/index.js"
+    },
+    "type": "module",
+    "scripts": {},
+    "keywords": [],
+    "author": "Yulai Nigmatullin",
+    "description": "",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Yulai202020/npm_packages/tree/main/pcap-parser"
+    },
+    "bugs": {
+        "url": "https://github.com/Yulai202020/npm_packages/issues"
+    },
+    "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/pcap-parser#readme",
+    "dependencies": {
+        "pcap-parser": "^0.2.1",
+        "systemd-journald": "^2.0.0"
+    },
+    "devDependencies": {
+        "tsup": "^8.3.6"
+    }
+}

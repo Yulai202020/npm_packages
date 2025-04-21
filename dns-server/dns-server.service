@@ -1,0 +1,12 @@
+[Unit]
+Description=Custom DNS Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/bun src/index.js -d 192.168.1.1
+WorkingDirectory=/home/yulai/projects/npm_packages/dns-server
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
