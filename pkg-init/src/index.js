@@ -72,6 +72,14 @@ async function ask_list(choices, question) {
     }
 }
 
+async function saveFileCreation(filepath, data) {
+    if (!await fs.exists(filepath)) {
+        await fs.writeFile(filepath, data);
+    } else {
+        throw new Error(`File ${filepath} is already exist.`);
+    }
+}
+
 // ask user
 
 const base_name = await ask('Base name ?', defualt_base_name);
@@ -183,12 +191,12 @@ if (isOk === 'yes') {
     process.exit(1);
 }
 
-await fs.writeFile('README.md', readme); // always
-await fs.writeFile('tsup.config.ts', tsup_config); // always
+await saveFileCreation('README.md', readme);
+await saveFileCreation('tsup.config.ts', tsup_config);
 
 await fs.mkdir(path.dirname(main), { recursive: true });
-await fs.writeFile(main, `console.log("Hello world!")`); // always
+await saveFileCreation(main, `console.log("Hello world!")`);
 
 if (extension === 'ts') {
-    await fs.writeFile('tsconfig.json', tsconfig);
+    await saveFileCreation('tsconfig.json', tsconfig);
 }

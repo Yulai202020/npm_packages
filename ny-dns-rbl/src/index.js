@@ -33,7 +33,7 @@ async function getAllDNSRecords(ip, service) {
         dns.resolve4(`${reversed_ip}.${service}`, (err, records) => {
             if (err && err.code === 'ENOTFOUND') {
                 resolve(`${ip} is NOT listed in ${service}`);
-            } else if (addresses) {
+            } else if (records) {
                 if (Array.isArray(records)) {
                     resolve(records.length > 0 ? records.flat() : [])
                 } else {
@@ -69,6 +69,5 @@ await isDnsServerReachable(dnsServer, dnsPort);
 dns.setServers([`${dnsServer}:${dnsPort}`]);
 
 if (isIP(ip)) {
-    const a = await getAllDNSRecords(ip, service);
-    console.log(a)
+    console.log(await getAllDNSRecords(ip, service));
 }
