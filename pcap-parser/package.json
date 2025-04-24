@@ -19,8 +19,12 @@
     },
     "homepage": "git+https://github.com/Yulai202020/npm_packages/tree/main/pcap-parser#readme",
     "dependencies": {
+        "commander": "^13.1.0",
         "pcap-parser": "^0.2.1",
-        "systemd-journald": "^2.0.0"
+        "sqlite": "^5.1.1",
+        "sqlite3": "^5.1.7",
+        "systemd-journald": "^2.0.0",
+        "tty-table": "^4.2.3"
     },
     "devDependencies": {
         "tsup": "^8.3.6"

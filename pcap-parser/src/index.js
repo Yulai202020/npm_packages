@@ -4,32 +4,37 @@ import pcapp from 'pcap-parser';
 import { writeFileSync } from 'fs';
 import { program } from 'commander';
 import packageJson from "../package.json" with { type: "json" };
+import { DatabaseSync } from 'node:sqlite';
+import Table from "tty-table";
 
-function bytesToBigInt(bytes) {
-    let result = 0n;
+function bytesToInt(bytes) {
+    let result = 0;
     for (const byte of bytes) {
-        result = (result << 8n) | BigInt(byte);
+        result = (result << 8) | byte;
     }
     return result;
 }
 
 program
     .argument('<pcap_file>')
-    .option('-o, --output <output_file>', 'Specify the upstream DNS port')
+    .option('-o, --output <output_file>', 'Specify the output file')
+    .option('-d, --db <database_file>', 'Specify the output file')
     .version(packageJson.version)
-    .description("Program for reading pcap files");
+    .description("Program for reading pcap files")
+    .parse(process.argv);
 
 const argument = program.args;
 const file = argument[0];
     
 const options = program.opts();
 const output_file = options?.output;
+const output_db_file = options?.db;
 const output = [];
 const parser = pcapp.parse(file);
 
 let count_of_packets = 0;
 
-parser.on('packet', function (packet) {
+parser.on('packet', (packet) => {
     count_of_packets += 1;
 
     const data = packet.data;
@@ -38,20 +43,17 @@ parser.on('packet', function (packet) {
     // ethernet header
     const ethernetHeader = {};
 
-    ethernetHeader['destinationMac'] = Array.from(data.slice(start, start + 6))
+    ethernetHeader['dstMAC'] = Array.from(data.slice(start, start + 6))
         .map((b) => b.toString(16).padStart(2, '0').toUpperCase())
         .join(':');
 
-    ethernetHeader['sourceMac'] = Array.from(data.slice(start + 6, start + 12))
+    ethernetHeader['srcMAC'] = Array.from(data.slice(start + 6, start + 12))
         .map((b) => b.toString(16).padStart(2, '0').toUpperCase())
         .join(':');
 
-    ethernetHeader['preamble'] = bytesToBigInt(
-        data.slice(start + 12, start + 19)
-    );
-    ethernetHeader['SFD'] = data[start + 20];
+    ethernetHeader['etherType'] = bytesToInt(data.slice(start + 12, start + 14)); 
 
-    start += 20;
+    start += 14;
 
     // ip header
     const ipHeader = {};
@@ -65,23 +67,23 @@ parser.on('packet', function (packet) {
 
     ipHeader['IHL'] = IHL;
     ipHeader['TOS'] = data[start + 1];
-    ipHeader['length'] = bytesToBigInt(data.slice(start + 2, start + 4));
-    ipHeader['id'] = bytesToBigInt(data.slice(start + 4, start + 6));
+    ipHeader['length'] = bytesToInt(data.slice(start + 2, start + 4));
+    ipHeader['id'] = bytesToInt(data.slice(start + 4, start + 6));
     ipHeader['flags'] = (data[start + 6] & 0b11100000) >> 5;
     ipHeader['fragmentOffset'] =
-        (BigInt(data[start + 6] & 0b00011111) << 8n) | BigInt(data[start + 7]);
+        (data[start + 6] & 0b00011111 << 8) | data[start + 7];
 
     ipHeader['TOL'] = data[start + 8];
 
     const protocol = data[start + 9];
 
     ipHeader['protocol'] = protocol;
-    ipHeader['checksum'] = bytesToBigInt(data.slice(start + 9, start + 11));
+    ipHeader['checksum'] = bytesToInt(data.slice(start + 9, start + 11));
     ipHeader['srcIP'] = data.slice(start + 12, start + 16).join('.');
     ipHeader['dstIP'] = data.slice(start + 16, start + 20).join('.');
 
     if (IHL > 20) {
-        ipHeader['IPOptions'] = bytesToBigInt(
+        ipHeader['IPOptions'] = bytesToInt(
             data.slice(start + 20, start + IHL)
         );
     }
@@ -101,8 +103,8 @@ parser.on('packet', function (packet) {
     const protocolHeader = {};
 
     if (protocol_type !== 'Other' && protocol_type !== 'ICMP') {
-        protocolHeader['srcPort'] = bytesToBigInt(data.slice(start, start + 2));
-        protocolHeader['dstPort'] = bytesToBigInt(
+        protocolHeader['srcPort'] = bytesToInt(data.slice(start, start + 2));
+        protocolHeader['dstPort'] = bytesToInt(
             data.slice(start + 2, start + 4)
         );
     }
@@ -110,11 +112,11 @@ parser.on('packet', function (packet) {
     start += 4;
 
     if (protocol_type === 'TCP') {
-        protocolHeader['sequenceNumber'] = bytesToBigInt(
+        protocolHeader['sequenceNumber'] = bytesToInt(
             data.slice(start, start + 4)
         );
 
-        protocolHeader['Acknowledgment'] = bytesToBigInt(
+        protocolHeader['Acknowledgment'] = bytesToInt(
             data.slice(start + 4, start + 8)
         );
 
@@ -126,15 +128,15 @@ parser.on('packet', function (packet) {
 
         start += 2;
 
-        protocolHeader['windowSize'] = bytesToBigInt(
+        protocolHeader['windowSize'] = bytesToInt(
             data.slice(start, start + 2)
         );
 
-        protocolHeader['checksum'] = bytesToBigInt(
+        protocolHeader['checksum'] = bytesToInt(
             data.slice(start + 2, start + 4)
         );
 
-        protocolHeader['urgentPointer'] = bytesToBigInt(
+        protocolHeader['urgentPointer'] = bytesToInt(
             data.slice(start + 4, start + 6)
         );
 
@@ -142,8 +144,8 @@ parser.on('packet', function (packet) {
     }
 
     if (protocol_type === 'UDP') {
-        protocolHeader['length'] = bytesToBigInt(data.slice(start, start + 2));
-        protocolHeader['checksum'] = bytesToBigInt(
+        protocolHeader['length'] = bytesToInt(data.slice(start, start + 2));
+        protocolHeader['checksum'] = bytesToInt(
             data.slice(start + 2, start + 4)
         );
 
@@ -151,7 +153,7 @@ parser.on('packet', function (packet) {
     }
 
     const body = data.slice(start).toString('hex');
-    
+
     output.push({
         ethernetHeader: ethernetHeader,
         ipHeader: ipHeader,
@@ -160,17 +162,97 @@ parser.on('packet', function (packet) {
     });
 });
 
+parser.on('end', () => {
+    if (output_file) {
+        writeFileSync(
+            output_file,
+            JSON.stringify(
+                output,
+                (key, value) =>
+                    typeof value === 'bigint' ? value.toString() : value,
+                '\t'
+            )
+        );
+    } else if (output_db_file) {
+        const db = new DatabaseSync(output_db_file);
 
-if (output_file) {
-    writeFileSync(
-        output_file,
-        JSON.stringify(
-            output,
-            (key, value) =>
-                typeof value === 'bigint' ? value.toString() : value,
-            '\t'
-        )
-    );
-} else {
-    // print
-}
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS ethernet (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              dstMAC TEXT,
+              srcMAC TEXT,
+              preamble TEXT,
+              SFD TEXT
+            );
+        `);
+        
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS ip (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ipVersion INTEGER,
+                IHL INTEGER,
+                TOS INTEGER,
+                length INTEGER,
+                identifier INTEGER,
+                flags INTEGER,
+                fragmentOffset INTEGER,
+                TOL INTEGER,
+                protocol INTEGER,
+                checksum INTEGER,
+                srcIP TEXT,
+                dstIP TEXT
+            );
+        `);
+        
+        db.exec(`
+            CREATE TABLE IF NOT EXISTS protocol (
+                id INTEGER PRIMARY KEY AUTOINCREMENT
+            );
+        `);
+        
+        const ethernet_insert = db.prepare(`INSERT INTO ethernet (dstMAC, srcMAC, preamble, SFD) VALUES (?, ?, ?, ?);`);
+        const ip_insert = db.prepare(`INSERT INTO ip (ipVersion, IHL, TOS, length, identifier, flags, fragmentOffset, TOL, protocol, checksum, srcIP, dstIP) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`);
+        
+        output.forEach((i, index) => {
+            ethernet_insert.run(...Object.values(i.ethernetHeader));
+            ip_insert.run(...Object.values(i.ipHeader));
+        })
+    } else {
+        output.forEach((i, index) => {
+            const ethernetHeader = [
+                {
+                    value: "Destination MAC"
+                },
+                {
+                    value: "Source MAC"
+                }
+            ];
+
+            const t1 = Table(ethernetHeader, [[i.ethernetHeader["dstMAC"], i.ethernetHeader["srcMAC"]]]);
+            console.log(t1.render());
+
+            const ipHeader = [
+                {
+                    value: "Destination IP"
+                },
+                {
+                    value: "Source IP"
+                },
+                {
+                    value: "Checksum"
+                }
+            ];
+
+            const ipRows = [
+                [
+                    i.ipHeader["dstIP"]+":"+i.protocolHeader["dstPort"],
+                    i.ipHeader["srcIP"]+":"+i.protocolHeader["srcPort"],
+                    i.ipHeader["checksum"]
+                ]
+            ]
+
+            const t2 = Table(ipHeader, ipRows);
+            console.log(t2.render());
+        });
+    }
+});
